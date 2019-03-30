@@ -1,6 +1,6 @@
 /* Include preprocessor directives */
 
-//now using git
+//now using git clone
 
 #include <FEHLCD.h>
 #include <FEHIO.h>
