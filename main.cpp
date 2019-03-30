@@ -433,7 +433,7 @@ void DDR_to_Foosball(){
     check_heading(90);
     Sleep(0.5);
     //go to top of ramp
-    move_forward(55, 27 * ONEINCH);
+    move_forward(55, 20 * ONEINCH);
     Sleep(1.0);
 
 
@@ -446,7 +446,7 @@ void DDR_to_Foosball(){
     }
 
     SD.Printf("\nGoing Down the stairs with adjusted motor\n\n");
-    move_forward(35, 13 * ONEINCH);
+    move_forward(35, 17 * ONEINCH);
 
     Sleep(0.25);
     run_motor(2 , 35);
