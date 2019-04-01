@@ -231,7 +231,7 @@ void turn_left(int percent, int counts){
 void run_motor(float sleep1, int percent)
 {
 
-    left_motor.SetPercent(percent);
+    left_motor.SetPercent(percent + 2);
     right_motor.SetPercent(percent);
     Sleep(sleep1);
 
@@ -372,7 +372,8 @@ void DDR_task(){
         SD.Printf("\nMoving Forwards\n\n");
         move_forward(35, ONEINCH * 6.0);
         turn_right(35, TURN90);
-
+        check_heading(270);
+        Sleep(0.25);
         SD.Printf("\nRuns into Button\n\n");
         // Runs into the DDR button
         move_forward(25, ONEINCH * 1.5);
@@ -380,6 +381,8 @@ void DDR_task(){
 
         //2
         move_backward(-35, ONEINCH * 2);
+        check_heading(270);
+        Sleep(0.25);
         turn_left(35, TURN90);
 
         // Runs into the wall after the DDR task
@@ -429,7 +432,7 @@ void DDR_to_Foosball(){
 
     SD.Printf("\nRAMP:\n\n");
     // Moves backward before going up the ramp
-    move_backward(-35 , ONEINCH * 2);
+    move_backward(-35 , ONEINCH);
     Sleep(0.5);
     //call checkheading 90
     check_heading(90);
@@ -446,54 +449,30 @@ void DDR_to_Foosball(){
         LCD.SetBackgroundColor(GREEN);
         LCD.Clear();
         SD.Printf("IN DEAD ZONE\n");
-
-        while(RPS.Heading() < 0 && i < 5){
+        int a = RPS.Heading();
+        while(a < 0 || i < 5){
             SD.Printf("RPS Heading: %f\n", RPS.Heading());
+            Sleep(.25);
             move_backward(-25, ONEINCH * 0.5);
+            Sleep(.25);
             ++i;
+            a = RPS.Heading();
         }
     }
 
     if(RPS.Heading() >= 0){
-
+        SD.Printf("CALLED RPS.");
         check_heading(90);
 
     }
 
-    /*
-    float a = RPS.Y();
-    for(int i = 0; i < 2; i++)
-    {
-        if(a == -2)
-        {
-            run_motor(0.25 , -35);
-        }
-        a = RPS.Y();
-    }
-    Sleep(2.0);
 
-    //move_backward(-35, ONEINCH * 3);
-    //Sleep(0.25);
-    if(RPS.Y()  >= 0)
-    {
-        check_heading(90);
-    }
-    Sleep(0.5);
-*/
-
-    //2
-    /*i = check_heading(90);
-    if(i != 0){
-        SD.Printf("RPS ERROR. SLEEPING");
-        Sleep(2.0);
-        turn_right(25, 25);
-    }*/
 
     SD.Printf("\nGoing Down the stairs with adjusted motor\n\n");
-    move_forward(35, 17 * ONEINCH);
+    move_forward(45, 20 * ONEINCH);
 
     Sleep(0.25);
-    run_motor(4.0 , 35);
+    run_motor(1.5, 35);
     Sleep(0.25);
 
     //3
@@ -501,7 +480,7 @@ void DDR_to_Foosball(){
     move_backward(-35 , ONEINCH * 2.5);
     Sleep(0.25);
 
-}
+}//
 
 // Moving the foosball counters
 void foosball(){
@@ -511,10 +490,10 @@ void foosball(){
     Sleep(0.25);
     // Turns left after backing up from the wall
     turn_left(25 , TURN45);
-    move_forward(25, ONEINCH);
+    move_forward(25, ONEINCH * 1.80);
     turn_left(25, TURN45);
 
-    move_forward(25 , ONEINCH * 2.5);
+    move_forward(25 , ONEINCH * 3.5);
     Sleep(0.25);
     servo.SetDegree(2);
     Sleep(0.5);
@@ -523,7 +502,7 @@ void foosball(){
     //run_motor(0.5 , 45);
 
     //made a change here in distance from 4 to 6.5
-    move_forward(45, 8 * ONEINCH);
+    move_forward(45, 8.5 * ONEINCH);
     Sleep(0.25);
     servo.SetDegree(80);
 
@@ -534,7 +513,7 @@ void foosball(){
 void foosball_to_lever()
 {
     //1
-    move_forward(55 , 8 * ONEINCH);// changed from 6 to 8 inches
+    move_forward(55 , 7.0 * ONEINCH);// changed from 6 to 6.5 inches
     turn_left(35 , TURN45);
     move_forward(55 , 3.0 * ONEINCH);
     // servo arm hits lever
@@ -577,7 +556,7 @@ void lever_to_coin()
     run_motor(0.75 , 35);
 
     //3
-    move_backward(-50, ONEINCH * 14);
+    move_backward(-50, ONEINCH * 13.75);
     turn_left(35, TURN90);
     run_motor(1.5,35);
 
