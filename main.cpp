@@ -92,6 +92,7 @@ void move_forward(int percent, int counts){
             SD.Printf("R_encoder: %d\tL_encoder: %d\n", right_encoder.Counts(), left_encoder.Counts());
             SD.Printf("Tilt: %d\tPercent done: %d\n\n", tilt, right_encoder.Counts()*100/counts);
             old_value = right_encoder.Counts();
+            LCD.WriteLine(right_encoder.Counts()*100/counts);
         }
 
         tilt = abs_a(tilt);
@@ -413,7 +414,7 @@ void DDR_task(){
     //still step 2
     move_backward(-35 , ONEINCH * 1.5);
     // Runs into the wall for the second time for 0.25 seconds to straighten chassis
-    run_motor(0.25, 35);
+    run_motor(0.20, 35);
     //3
     move_backward(-35 , ONEINCH * 1.5);
     turn_left(35, TURN90);
@@ -423,8 +424,9 @@ void DDR_task(){
 // Moving from the DDR to the foosball
 void DDR_to_Foosball(){
 
-    int i;
+    int i = 0;
     //1
+
     SD.Printf("\nRAMP:\n\n");
     // Moves backward before going up the ramp
     move_backward(-35 , ONEINCH * 2);
@@ -434,8 +436,26 @@ void DDR_to_Foosball(){
     Sleep(0.5);
 
     //go to top of ramp
-    move_forward(55, 21 * ONEINCH);
-    //Sleep(1.0);
+    move_forward(55, 23 * ONEINCH);
+    LCD.SetBackgroundColor(YELLOW);
+    LCD.Clear();
+    Sleep(3.0);
+
+    SD.Printf("AFTER RAMP MOVEMENT\n");
+    if(RPS.Heading() < 0){
+        LCD.SetBackgroundColor(GREEN);
+        LCD.Clear();
+        SD.Printf("IN DEAD ZONE\n");
+
+        while(RPS.Heading() < 0 && i < 5){
+            SD.Printf("RPS Heading: %f\n", RPS.Heading());
+            move_backward(-25, ONEINCH * 0.5);
+            ++i;
+        }
+    }
+
+
+    /*
     float a = RPS.Y();
     for(int i = 0; i < 2; i++)
     {
@@ -454,7 +474,7 @@ void DDR_to_Foosball(){
         check_heading(90);
     }
     Sleep(0.5);
-
+*/
 
     //2
     /*i = check_heading(90);
@@ -468,7 +488,7 @@ void DDR_to_Foosball(){
     move_forward(35, 17 * ONEINCH);
 
     Sleep(0.25);
-    run_motor(3.5 , 25);
+    run_motor(4.0 , 35);
     Sleep(0.25);
 
     //3
@@ -496,7 +516,7 @@ void foosball(){
     //run_motor(0.5 , 45);
 
     //made a change here in distance from 4 to 6.5
-    move_forward(45, 6.5 * ONEINCH);
+    move_forward(45, 8 * ONEINCH);
     Sleep(0.25);
     servo.SetDegree(80);
 
@@ -603,7 +623,7 @@ int main(void){
     RPS.InitializeTouchMenu();
 
     SD.OpenLog();
-    SD.Printf("VERSION: %s\nBATTERY VOLTAGE: %f\n\n\n","1.1.0", Battery.Voltage());
+    SD.Printf("VERSION: %s\nBATTERY VOLTAGE: %f\n\n\n","1.0.3", Battery.Voltage());
 
     //Servo motor max and min values
     servo.SetMin(514);
