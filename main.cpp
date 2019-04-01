@@ -454,6 +454,11 @@ void DDR_to_Foosball(){
         }
     }
 
+    if(RPS.Heading() >= 0){
+
+        check_heading(90);
+
+    }
 
     /*
     float a = RPS.Y();
