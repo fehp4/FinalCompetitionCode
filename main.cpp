@@ -87,7 +87,7 @@ void move_forward(int percent, int counts){
         tilt = (right_encoder.Counts() - left_encoder.Counts());
 
         //write to file every 5 counts
-        if(right_encoder.Counts() > old_value + 5){
+        if(right_encoder.Counts() > old_value + 10){
 
             SD.Printf("R_encoder: %d\tL_encoder: %d\n", right_encoder.Counts(), left_encoder.Counts());
             SD.Printf("Tilt: %d\tPercent done: %d\n\n", tilt, right_encoder.Counts()*100/counts);
@@ -432,24 +432,43 @@ void DDR_to_Foosball(){
     //call checkheading 90
     check_heading(90);
     Sleep(0.5);
+
     //go to top of ramp
-    move_forward(55, 20 * ONEINCH);
-    Sleep(1.0);
+    move_forward(55, 21 * ONEINCH);
+    //Sleep(1.0);
+    float a = RPS.Y();
+    for(int i = 0; i < 2; i++)
+    {
+        if(a == -2)
+        {
+            run_motor(0.25 , -35);
+        }
+        a = RPS.Y();
+    }
+    Sleep(2.0);
+
+    //move_backward(-35, ONEINCH * 3);
+    //Sleep(0.25);
+    if(RPS.Y()  >= 0)
+    {
+        check_heading(90);
+    }
+    Sleep(0.5);
 
 
     //2
-    i = check_heading(90);
+    /*i = check_heading(90);
     if(i != 0){
         SD.Printf("RPS ERROR. SLEEPING");
         Sleep(2.0);
         turn_right(25, 25);
-    }
+    }*/
 
     SD.Printf("\nGoing Down the stairs with adjusted motor\n\n");
     move_forward(35, 17 * ONEINCH);
 
     Sleep(0.25);
-    run_motor(2 , 35);
+    run_motor(3.5 , 25);
     Sleep(0.25);
 
     //3
@@ -475,7 +494,9 @@ void foosball(){
 
     // Drags the foosball counters
     //run_motor(0.5 , 45);
-    move_forward(45, 4 * ONEINCH);
+
+    //made a change here in distance from 4 to 6.5
+    move_forward(45, 6.5 * ONEINCH);
     Sleep(0.25);
     servo.SetDegree(80);
 
@@ -486,7 +507,7 @@ void foosball(){
 void foosball_to_lever()
 {
     //1
-    move_forward(55 , 6 * ONEINCH);
+    move_forward(55 , 8 * ONEINCH);// changed from 6 to 8 inches
     turn_left(35 , TURN45);
     move_forward(55 , 3.0 * ONEINCH);
     // servo arm hits lever
