@@ -436,7 +436,7 @@ void DDR_to_Foosball(){
     Sleep(0.5);
 
     //go to top of ramp
-    move_forward(55, 23 * ONEINCH);
+    move_forward(55, 25 * ONEINCH);
     LCD.SetBackgroundColor(YELLOW);
     LCD.Clear();
     Sleep(3.0);
@@ -498,7 +498,7 @@ void DDR_to_Foosball(){
 
     //3
     SD.Printf("\nMoving Backwards\n\n");
-    move_backward(-35 , ONEINCH * 1.5);
+    move_backward(-35 , ONEINCH * 2.5);
     Sleep(0.25);
 
 }
@@ -510,7 +510,9 @@ void foosball(){
     //starts after robot has moved back from foosball wall
     Sleep(0.25);
     // Turns left after backing up from the wall
-    turn_left(25 , TURN90);
+    turn_left(25 , TURN45);
+    move_forward(25, ONEINCH);
+    turn_left(25, TURN45);
 
     move_forward(25 , ONEINCH * 2.5);
     Sleep(0.25);
