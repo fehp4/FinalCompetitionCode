@@ -400,7 +400,7 @@ void DDR_task(){
         turn_left(35, TURN90);
 
         // Runs into the wall after the DDR task
-        run_motor(1.0, 35);
+        run_motor(1.5, 35);
         move_backward(-35 , ONEINCH * 1.5);
         Sleep(0.25);
 
@@ -426,7 +426,7 @@ void DDR_task(){
         move_backward(-35, ONEINCH * 2);
         turn_left(35, TURN90);
     // Runs into the wall for first time
-        run_motor(1.0, 35);
+        run_motor(1.5, 35);
         move_backward(-35 , ONEINCH * 1.5);
         Sleep(0.25);
 
@@ -459,7 +459,7 @@ void DDR_to_Foosball(){
     Sleep(0.5);
 
     //go to top of ramp
-    ramp(2.35 , 55);
+    ramp(2.4 , 55);
     //move_forward(55, 27.5 * ONEINCH);
     LCD.SetBackgroundColor(YELLOW);
     SD.Printf("\nTURNING YELLOW!\n");
@@ -488,7 +488,7 @@ void DDR_to_Foosball(){
         SD.Printf("\nFINISHED CHECKING HEADING!");
     }
 
-    move_backward(-25 , ONEINCH * 10);
+    move_backward(-25 , ONEINCH * 12);
     SD.Printf("AFTER RAMP MOVEMENT\n");
     SD.Printf("\nGoing Down the stairs with adjusted motor\n\n");
     // HITS THE BOTTOM OF THE STAIRS TO CORRECT ITSELF
@@ -524,11 +524,11 @@ void foosball(){
     Sleep(0.25);
     // Turns left after backing up from the wall
     turn_left(25 , TURN45);
-    run_motor(0.5,35);
+    run_motor(0.25 , 35);
     turn_left(25 , TURN45);
     Sleep(0.25);
 
-    move_forward(25 , ONEINCH * 2.0);
+    move_forward(25 , ONEINCH * 1.75);
     Sleep(0.25);
     servo.SetDegree(2);
     Sleep(0.5);
@@ -537,12 +537,23 @@ void foosball(){
     //run_motor(0.5 , 45);
 
     //made a change here in distance from 4 to 6.5
-    move_forward(45, 8.5 * ONEINCH);
+    move_forward(45, 7.0 * ONEINCH);
     Sleep(0.25);
     servo.SetDegree(80);
     Sleep(0.25);
+    move_backward(-25 , ONEINCH * 1.5);
+    Sleep(0.25);
+    servo.SetDegree(2);
+    Sleep(0.25);
+    move_forward(45 , ONEINCH);
+    Sleep(0.25);
+    servo.SetDegree(80);
+    Sleep(0.25);
+
+
+
     turn_left(25 , TURN45);
-    move_forward(25 , ONEINCH * 2);
+    move_forward(25 , ONEINCH * 1.0);
     turn_right(25 , TURN45);
 
 }
