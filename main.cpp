@@ -453,7 +453,7 @@ void DDR_to_Foosball(){
     Sleep(0.5);
 
     //go to top of ramp
-    ramp(2 , 55);
+    ramp(2.55 , 55);
     //move_forward(55, 27.5 * ONEINCH);
     LCD.SetBackgroundColor(YELLOW);
     SD.Printf("\nTURNING YELLOW!\n");
@@ -510,9 +510,12 @@ void foosball(){
     //starts after robot has moved back from foosball wall
     Sleep(0.25);
     // Turns left after backing up from the wall
-    turn_left(25 , TURN90);
+    turn_left(25 , TURN45);
+    run_motor(0.5,35);
+    turn_left(25 , TURN45);
+    Sleep(0.25);
 
-    move_forward(25 , ONEINCH * 3.5);
+    move_forward(25 , ONEINCH * 2.0);
     Sleep(0.25);
     servo.SetDegree(2);
     Sleep(0.5);
@@ -524,6 +527,10 @@ void foosball(){
     move_forward(45, 8.5 * ONEINCH);
     Sleep(0.25);
     servo.SetDegree(80);
+    Sleep(0.25);
+    turn_left(25 , TURN45);
+    move_forward(25 , ONEINCH * 2);
+    turn_right(25 , TURN45);
 
 }
 
@@ -532,7 +539,7 @@ void foosball(){
 void foosball_to_lever()
 {
     //1
-    move_forward(35 , 7.0 * ONEINCH);// changed from 6 to 6.5 inches
+    move_forward(35 , 6.0 * ONEINCH);// changed from 6 to 6.5 inches
     turn_left(35 , TURN45);
     move_forward(35 , 3.0 * ONEINCH);
     // servo arm hits lever
