@@ -441,38 +441,39 @@ void DDR_to_Foosball(){
     //go to top of ramp
     move_forward(55, 25 * ONEINCH);
     LCD.SetBackgroundColor(YELLOW);
+    SD.Printf("\nTURNING YELLOW!\n");
     LCD.Clear();
+    SD.Printf("\nTURNING OFF BOTH FUDGECAKING MOTORS.");
+    right_motor.Stop();
+    left_motor.Stop();
     Sleep(3.0);
+    // turns 180 degrees , facing DDR
+    SD.Printf("\nTURNING 180!");
+    turn_right(25 , TURN90 * 2);
+    SD.Printf("\nTurned right, facing DDR");
+    Sleep(0.25);
+    int a = RPS.Y();
+    if(a >= 0)
+    {
+        SD.Printf("\nCHECKING 270");
+        check_heading(270);
+        SD.Printf("\nFINISHED CHECKING HEADING!");
+    }
 
+    move_backward(-25 , ONEINCH * 5  );
     SD.Printf("AFTER RAMP MOVEMENT\n");
-    if(RPS.Heading() < 0){
-        LCD.SetBackgroundColor(GREEN);
-        LCD.Clear();
-        SD.Printf("IN DEAD ZONE\n");
-        int a = RPS.Heading();
-        while(a < 0 || i < 5){
-            SD.Printf("RPS Heading: %f\n", RPS.Heading());
-            Sleep(.25);
-            move_backward(-25, ONEINCH * 0.5);
-            Sleep(.25);
-            ++i;
-            a = RPS.Heading();
-        }
-    }
-
-    if(RPS.Heading() >= 0){
-        SD.Printf("CALLED RPS.");
-        check_heading(90);
-
-    }
-
-
-
     SD.Printf("\nGoing Down the stairs with adjusted motor\n\n");
-    move_forward(45, 20 * ONEINCH);
+    // HITS THE BOTTOM OF THE STAIRS TO CORRECT ITSELF
+    run_motor(1.0,10);
+    Sleep(0.25);
+    move_backward(-25 , ONEINCH * 3);
+    Sleep(0.25);
+    turn_right(25 , TURN90 * 2);
+
+
 
     Sleep(0.25);
-    run_motor(1.5, 35);
+    run_motor(2.0, 35);
     Sleep(0.25);
 
     //3
@@ -609,7 +610,7 @@ int main(void){
     RPS.InitializeTouchMenu();
 
     SD.OpenLog();
-    SD.Printf("VERSION: %s\nBATTERY VOLTAGE: %f\n\n\n","1.0.3", Battery.Voltage());
+    SD.Printf("VERSION: %s\nBATTERY VOLTAGE: %f\n\n\n","1.0.5", Battery.Voltage());
 
     //Servo motor max and min values
     servo.SetMin(514);
