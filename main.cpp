@@ -400,7 +400,9 @@ void DDR_task(){
         turn_left(35, TURN90);
 
         // Runs into the wall after the DDR task
-        run_motor(3, 35);
+        run_motor(1.0, 35);
+        move_backward(-35 , ONEINCH * 1.5);
+        Sleep(0.25);
 
 
     } else {
@@ -424,18 +426,22 @@ void DDR_task(){
         move_backward(-35, ONEINCH * 2);
         turn_left(35, TURN90);
     // Runs into the wall for first time
-        run_motor(1, 35);
+        run_motor(1.0, 35);
+        move_backward(-35 , ONEINCH * 1.5);
+        Sleep(0.25);
 
     }
 
     //still step 2
-    move_backward(-35 , ONEINCH * 1.5);
+   /* move_backward(-35 , ONEINCH * 1.5);
     // Runs into the wall for the second time for 0.25 seconds to straighten chassis
     run_motor(0.20, 35);
     //3
     move_backward(-35 , ONEINCH * 1.5);
-    turn_left(35, TURN90);
-    Sleep(0.25);
+
+    Sleep(0.25);*/
+
+     turn_left(35, TURN90);
 }
 
 // Moving from the DDR to the foosball
@@ -453,7 +459,7 @@ void DDR_to_Foosball(){
     Sleep(0.5);
 
     //go to top of ramp
-    ramp(2.55 , 55);
+    ramp(2.35 , 55);
     //move_forward(55, 27.5 * ONEINCH);
     LCD.SetBackgroundColor(YELLOW);
     SD.Printf("\nTURNING YELLOW!\n");
@@ -461,13 +467,20 @@ void DDR_to_Foosball(){
     SD.Printf("\nTURNING OFF BOTH FUDGECAKING MOTORS.");
     //right_motor.Stop();
     //left_motor.Stop();
+    int a = RPS.Y();
     Sleep(0.25);
     // turns 180 degrees , facing DDR
+    if(a >= 0)
+    {
+        SD.Printf("\nCHECKING 90");
+        check_heading(90);
+        SD.Printf("\nFINISHED CHECKING HEADING!");
+    }
     SD.Printf("\nTURNING 180!");
     turn_right(25 , TURN90 * 2);
     SD.Printf("\nTurned right, facing DDR");
     Sleep(0.25);
-    int a = RPS.Y();
+    a = RPS.Y();
     if(a >= 0)
     {
         SD.Printf("\nCHECKING 270");
@@ -475,7 +488,7 @@ void DDR_to_Foosball(){
         SD.Printf("\nFINISHED CHECKING HEADING!");
     }
 
-    move_backward(-25 , ONEINCH * 7);
+    move_backward(-25 , ONEINCH * 10);
     SD.Printf("AFTER RAMP MOVEMENT\n");
     SD.Printf("\nGoing Down the stairs with adjusted motor\n\n");
     // HITS THE BOTTOM OF THE STAIRS TO CORRECT ITSELF
