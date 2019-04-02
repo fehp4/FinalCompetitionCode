@@ -231,7 +231,7 @@ void turn_left(int percent, int counts){
 void run_motor(float sleep1, int percent)
 {
 
-    left_motor.SetPercent(percent + 2);
+    left_motor.SetPercent(percent);
     right_motor.SetPercent(percent);
     Sleep(sleep1);
 
@@ -244,6 +244,20 @@ void run_motor(float sleep1, int percent)
     Sleep(1.0);
 }
 
+void ramp(float sleep1, int percent)
+{
+    left_motor.SetPercent(percent + 2);
+    right_motor.SetPercent(percent);
+    Sleep(sleep1);
+
+    left_motor.Stop();
+    right_motor.Stop();
+
+    left_encoder.ResetCounts();
+    right_encoder.ResetCounts();
+
+    Sleep(1.0);
+}
 
 // Checking RPS Heading
 int check_heading(float heading) //using RPS
@@ -439,14 +453,15 @@ void DDR_to_Foosball(){
     Sleep(0.5);
 
     //go to top of ramp
-    move_forward(55, 27.5 * ONEINCH);
+    ramp(2 , 55);
+    //move_forward(55, 27.5 * ONEINCH);
     LCD.SetBackgroundColor(YELLOW);
     SD.Printf("\nTURNING YELLOW!\n");
     LCD.Clear();
     SD.Printf("\nTURNING OFF BOTH FUDGECAKING MOTORS.");
-    right_motor.Stop();
-    left_motor.Stop();
-    Sleep(3.0);
+    //right_motor.Stop();
+    //left_motor.Stop();
+    Sleep(0.25);
     // turns 180 degrees , facing DDR
     SD.Printf("\nTURNING 180!");
     turn_right(25 , TURN90 * 2);
@@ -460,17 +475,22 @@ void DDR_to_Foosball(){
         SD.Printf("\nFINISHED CHECKING HEADING!");
     }
 
-    move_backward(-25 , ONEINCH * 5  );
+    move_backward(-25 , ONEINCH * 7);
     SD.Printf("AFTER RAMP MOVEMENT\n");
     SD.Printf("\nGoing Down the stairs with adjusted motor\n\n");
     // HITS THE BOTTOM OF THE STAIRS TO CORRECT ITSELF
-    run_motor(1.0,10);
+    //run_motor(1.0,10);
     Sleep(0.25);
-    move_backward(-25 , ONEINCH * 3);
-    Sleep(0.25);
+   // move_backward(-25 , ONEINCH * 3);
+   // Sleep(0.25);
     turn_right(25 , TURN90 * 2);
-
-
+    a = RPS.Y();
+    if(a >= 0)
+    {
+        SD.Printf("\nCHECKING 90");
+        check_heading(90);
+        SD.Printf("\nFINISHED CHECKING HEADING!");
+    }
 
     Sleep(0.25);
     run_motor(2.0, 35);
@@ -478,10 +498,10 @@ void DDR_to_Foosball(){
 
     //3
     SD.Printf("\nMoving Backwards\n\n");
-    move_backward(-35 , ONEINCH * 2.5);
+    move_backward(-35 , ONEINCH * 1.5);
     Sleep(0.25);
 
-}//
+}
 
 // Moving the foosball counters
 void foosball(){
@@ -490,9 +510,7 @@ void foosball(){
     //starts after robot has moved back from foosball wall
     Sleep(0.25);
     // Turns left after backing up from the wall
-    turn_left(25 , TURN45);
-    move_forward(25, ONEINCH * 1.80);
-    turn_left(25, TURN45);
+    turn_left(25 , TURN90);
 
     move_forward(25 , ONEINCH * 3.5);
     Sleep(0.25);
@@ -514,9 +532,9 @@ void foosball(){
 void foosball_to_lever()
 {
     //1
-    move_forward(55 , 7.0 * ONEINCH);// changed from 6 to 6.5 inches
+    move_forward(35 , 7.0 * ONEINCH);// changed from 6 to 6.5 inches
     turn_left(35 , TURN45);
-    move_forward(55 , 3.0 * ONEINCH);
+    move_forward(35 , 3.0 * ONEINCH);
     // servo arm hits lever
 
 }
@@ -538,10 +556,10 @@ void lever()
 void lever_to_coin()
 {
     //1
-    move_forward(50, ONEINCH*3.0);
+    move_forward(35, ONEINCH*3.0);
     turn_left(35, TURN45);
     int i;
-    move_forward(50, ONEINCH * 11.0);
+    move_forward(35, ONEINCH * 11.0);
 
     i = check_heading(270);
 
@@ -557,7 +575,7 @@ void lever_to_coin()
     run_motor(0.75 , 35);
 
     //3
-    move_backward(-50, ONEINCH * 13.75);
+    move_backward(-35, ONEINCH * 13.75);
     turn_left(35, TURN90);
     run_motor(1.5,35);
 
