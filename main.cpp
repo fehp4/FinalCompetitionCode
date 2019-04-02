@@ -246,7 +246,7 @@ void run_motor(float sleep1, int percent)
 
 void ramp(float sleep1, int percent)
 {
-    left_motor.SetPercent(percent + 2);
+    left_motor.SetPercent(percent);
     right_motor.SetPercent(percent);
     Sleep(sleep1);
 
@@ -276,14 +276,14 @@ int check_heading(float heading) //using RPS
 
 
     // NOTE: DO NOT PASS IN heading = 0
-    while(RPS.Heading() < heading - 5 || RPS.Heading() > heading + 5){
+    while(RPS.Heading() < heading - 3.5 || RPS.Heading() > heading + 3.5){
 
-        if(RPS.Heading() < heading - 5){
+        if(RPS.Heading() < heading - 3.5){
             turn_left(30, 12);
 
         }
 
-        else if(RPS.Heading() > heading + 5){
+        else if(RPS.Heading() > heading + 3.5){
             turn_right(30, 12);
 
         }
@@ -417,7 +417,7 @@ void DDR_task(){
         turn_left(35 , TURN90);
         move_forward(35, ONEINCH * 3);
         turn_right(35, TURN90);
-        move_forward(35, ONEINCH * 13.5);
+        move_forward(35, ONEINCH * 13);
         turn_right(35, TURN90);
 
         run_motor(7, 35);
@@ -459,7 +459,7 @@ void DDR_to_Foosball(){
     Sleep(0.5);
 
     //go to top of ramp
-    ramp(2.4 , 55);
+    ramp(2.5 , 55);
     //move_forward(55, 27.5 * ONEINCH);
     LCD.SetBackgroundColor(YELLOW);
     SD.Printf("\nTURNING YELLOW!\n");
@@ -506,7 +506,7 @@ void DDR_to_Foosball(){
     }
 
     Sleep(0.25);
-    run_motor(2.0, 35);
+    run_motor(2.5, 35); //changed from 2.0 to 2.5
     Sleep(0.25);
 
     //3
@@ -524,7 +524,7 @@ void foosball(){
     Sleep(0.25);
     // Turns left after backing up from the wall
     turn_left(25 , TURN45);
-    run_motor(0.25 , 35);
+    run_motor(0.4 , 35); // changed from 0.25 to 0.35
     turn_left(25 , TURN45);
     Sleep(0.25);
 
@@ -544,11 +544,11 @@ void foosball(){
     move_backward(-25 , ONEINCH * 1.5);
     Sleep(0.25);
     servo.SetDegree(2);
-    Sleep(0.25);
-    move_forward(45 , ONEINCH);
+    Sleep(0.5);
+    move_forward(45 , ONEINCH * 3);
     Sleep(0.25);
     servo.SetDegree(80);
-    Sleep(0.25);
+    Sleep(0.5);
 
 
 
