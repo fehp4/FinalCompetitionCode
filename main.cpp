@@ -439,7 +439,7 @@ void DDR_to_Foosball(){
     Sleep(0.5);
 
     //go to top of ramp
-    move_forward(55, 25 * ONEINCH);
+    move_forward(55, 27.5 * ONEINCH);
     LCD.SetBackgroundColor(YELLOW);
     SD.Printf("\nTURNING YELLOW!\n");
     LCD.Clear();
