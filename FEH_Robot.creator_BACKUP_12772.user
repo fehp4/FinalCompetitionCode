@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.2.1, 2019-04-02T21:49:42. -->
+<<<<<<< HEAD
+<!-- Written by QtCreator 4.2.1, 2019-03-29T21:55:04. -->
+=======
+<!-- Written by QtCreator 4.2.1, 2019-04-01T16:38:42. -->
+>>>>>>> cfed2612ef73e6dfa8e7ee020b03b2e4f7ada401
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
-  <value type="QByteArray">{0b1cc376-f1c4-4a60-bb37-e23ed46817cc}</value>
+  <value type="QByteArray">{d077bd8e-708a-4e3d-8279-9f12119ea9b6}</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -70,7 +74,7 @@
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <valuelist type="QVariantList" key="GenericProjectManager.GenericMakeStep.BuildTargets">
-       <value type="QString">clean</value>
+       <value type="QString">all</value>
       </valuelist>
       <value type="bool" key="GenericProjectManager.GenericMakeStep.Clean">false</value>
       <value type="QString" key="GenericProjectManager.GenericMakeStep.MakeArguments"></value>
@@ -79,9 +83,6 @@
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Make</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">GenericProjectManager.GenericMakeStep</value>
-      <valuelist type="QVariantList" key="UserStickyKeys">
-       <value type="QString">GenericProjectManager.GenericMakeStep.BuildTargets</value>
-      </valuelist>
      </valuemap>
      <value type="int" key="ProjectExplorer.BuildStepList.StepsCount">1</value>
      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Build</value>
