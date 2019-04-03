@@ -1,7 +1,4 @@
 /* Include preprocessor directives */
-//vscode
-//now using git clone
-
 #include <FEHLCD.h>
 #include <FEHIO.h>
 #include <FEHUtility.h>
@@ -15,14 +12,19 @@
 #include <string.h>
 #include <stdio.h>
 
+
+//235 counts to turn 90 degrees
 #define TURN90 235
+//115 counts to turn 45 degrees
 #define TURN45 115
 #define TURN40 105
 #define TURN55 144
 #define TURN270 705
+//40 counts per inch
 #define ONEINCH 40
 #define DEFAULTPOWER 35
 #define PCONST 0.5
+
 
 //Declarations for encoders & motors
 DigitalEncoder right_encoder(FEHIO::P0_0);
@@ -63,7 +65,17 @@ void correct(void){
         right_motor.Stop();
     }
 
-    Sleep(1.0);
+    LCD.SetBackgroundColor(BLACK);
+    LCD.Clear();
+
+    Sleep(0.25);
+
+    LCD.SetBackgroundColor(WHITE);
+    LCD.Clear();
+
+    LCD.SetBackgroundColor(BLACK);
+    LCD.Clear();
+
 }
 
 // Function to move forward
@@ -86,11 +98,12 @@ void move_forward(int percent, int counts){
         tilt = (right_encoder.Counts() - left_encoder.Counts());
 
         //write to file every 5 counts
-        if(right_encoder.Counts() > old_value + 5){
+        if(right_encoder.Counts() > old_value + 10){
 
             SD.Printf("R_encoder: %d\tL_encoder: %d\n", right_encoder.Counts(), left_encoder.Counts());
             SD.Printf("Tilt: %d\tPercent done: %d\n\n", tilt, right_encoder.Counts()*100/counts);
             old_value = right_encoder.Counts();
+            LCD.WriteLine(right_encoder.Counts()*100/counts);
         }
 
         tilt = abs_a(tilt);
@@ -110,7 +123,7 @@ void move_forward(int percent, int counts){
         }
     }
 
-    //Turn off motors
+    // Turn off motors
     right_motor.Stop();
     left_motor.Stop();
 
@@ -123,18 +136,18 @@ void move_forward(int percent, int counts){
 // Function to move backward
 void move_backward(int percent, int counts){
 
-    //Reset encoder counts
+    // Reset encoder counts
     right_encoder.ResetCounts();
     left_encoder.ResetCounts();
 
-    //Set both motors to desired percent
+    // Set both motors to desired percent
     right_motor.SetPercent(percent);
     left_motor.SetPercent(percent);
 
     int old_value = 0;
     int tilt = (right_encoder.Counts() - left_encoder.Counts());
 
-    //write to file every 5 counts
+    // write to file every 5 counts
     if(right_encoder.Counts() > old_value + 5){
 
         SD.Printf("R_encoder: %d\tL_encoder: %d\n", right_encoder.Counts(), left_encoder.Counts());
@@ -142,7 +155,7 @@ void move_backward(int percent, int counts){
         old_value = right_encoder.Counts();
     }
 
-    //While the average of the left and right encoder is less than counts, keep running motors
+    // While the average of the left and right encoder is less than counts, keep running motors
     while(left_encoder.Counts() < counts && right_encoder.Counts() < counts){
         if(right_encoder.Counts() < left_encoder.Counts()){
             right_motor.SetPercent(percent - 0.25);
@@ -158,49 +171,29 @@ void move_backward(int percent, int counts){
         }
     }
 
-    //Turn off motors
+    // Turn off motors
     right_motor.Stop();
     left_motor.Stop();
     Sleep(0.25);
 
 }
 
-//function where one motor must run faster than the other
-void adjustMotor(int percent, int counts){
-    //Reset encoder counts
-    right_encoder.ResetCounts();
-    left_encoder.ResetCounts();
-
-    //Set both motors to desired percent
-    right_motor.SetPercent(percent);
-    left_motor.SetPercent(percent + 2);
-
-    //While the average of the left and right encoder is less than counts, keep running motors
-    while(left_encoder.Counts() < counts && right_encoder.Counts() < counts);
-
-    //Turn off motors
-    right_motor.Stop();
-    left_motor.Stop();
-
-    Sleep(1.0);
-}
-
 // Function to turn right
 void turn_right(int percent, int counts){
 
-    //Reset encoder counts
+    // Reset encoder counts
     right_encoder.ResetCounts();
     left_encoder.ResetCounts();
 
 
-    //Set both motors to desired percent
-    //hint: set right motor backwards, left motor forwards
+    // Set both motors to desired percent
+    // hint: set right motor backwards, left motor forwards
 
     right_motor.SetPercent(-percent);
     left_motor.SetPercent(percent);
 
-    //While the average of the left and right encoder is less than counts,
-    //keep running motors
+    // While the average of the left and right encoder is less than counts,
+    // keep running motors
 
 
     while(left_encoder.Counts() < counts) {
@@ -210,7 +203,7 @@ void turn_right(int percent, int counts){
 
     }
 
-    //Turn off motors
+    // Turn off motors
     right_motor.Stop();
     left_motor.Stop();
 }
@@ -218,17 +211,17 @@ void turn_right(int percent, int counts){
 // Function to turn left
 void turn_left(int percent, int counts){
 
-    //Reset encoder counts
+    // Reset encoder counts
     right_encoder.ResetCounts();
     left_encoder.ResetCounts();
 
-    //Set both motors to desired percent
+    // Set both motors to desired percent
 
     right_motor.SetPercent(percent);
     left_motor.SetPercent(-percent);
 
-    //While the average of the left and right encoder is less than counts,
-    //keep running motors
+    // While the average of the left and right encoder is less than counts,
+    // keep running motors
 
     while(right_encoder.Counts() < counts) {
 
@@ -237,61 +230,16 @@ void turn_left(int percent, int counts){
     }
 
 
-    //Turn off motors
+    // Turn off motors
     right_motor.Stop();
     left_motor.Stop();
 }
 
-int check_heading(float heading) //using RPS
-{
+// time is in seconds not milliseconds
+// Runs motors for certain number of seconds
+// Used instead of move_forward because of shaft encoding issues
 
-    SD.Printf("\n\nHEADING BEFORE: %f\n", RPS.Heading());
-    LCD.WriteLine(RPS.Heading());
-
-    if (RPS.Heading() < 0){
-        return 2;
-    }
-
-
-    //NOTE: DO NOT PASS IN heading = 0
-    while(RPS.Heading() < heading - 5 || RPS.Heading() > heading + 5){
-
-        if(RPS.Heading() < heading - 5){
-            turn_left(30, 12);
-
-        }
-
-        else if(RPS.Heading() > heading + 5){
-            turn_right(30, 12);
-
-        }
-
-       // LCD.WriteLine(RPS.Heading());
-        Sleep(.25);
-
-    }
-
-    SD.Printf("\n\nHEADING AFTER: %f\n", RPS.Heading());
-    LCD.WriteLine(RPS.Heading());
-
-    return 0;
-
-}
-
-// Function to move servo arm
-void move_servo()
-{
-
-    servo.SetDegree(80);
-    Sleep(1.0);
-    servo.SetDegree(0);
-    Sleep(1000);
-    servo.SetDegree(80);
-
-}
-
-//time is in seconds not milliseconds
-void RunMotor(float sleep1, int percent)
+void run_motor(float sleep1, int percent)
 {
 
     left_motor.SetPercent(percent);
@@ -307,8 +255,91 @@ void RunMotor(float sleep1, int percent)
     Sleep(1.0);
 }
 
-//function to sweep DDR light
-float rotateDDR(int counts){
+void ramp(float sleep1, int percent)
+{
+    left_motor.SetPercent(percent);
+    right_motor.SetPercent(percent);
+    Sleep(sleep1);
+
+    left_motor.Stop();
+    right_motor.Stop();
+
+    left_encoder.ResetCounts();
+    right_encoder.ResetCounts();
+
+    Sleep(1.0);
+}
+
+
+// Checking RPS Heading
+int check_heading(float heading) //using RPS
+{
+
+    SD.Printf("\n\nHEADING BEFORE: %f\n", RPS.Heading());
+    LCD.WriteLine(RPS.Heading());
+
+    while(RPS.Heading() < 0){
+        move_backward(-25, ONEINCH * 0.25);
+        Sleep(1.0);
+        SD.Printf("\n\nRPS ERROR\nHeading: %f\tX: %f\tY: %f\n", RPS.Heading(), RPS.X(), RPS.Y());
+        //check_heading(heading);
+
+    }
+
+
+    // NOTE: DO NOT PASS IN heading = 0
+    while(RPS.Heading() < heading - 2 || RPS.Heading() > heading + 2){
+
+        if(RPS.Heading() < heading - 2){
+            turn_left(30, 5);
+
+        }
+
+        else if(RPS.Heading() > heading + 2){
+            turn_right(30, 5);
+
+        }
+
+       // LCD.WriteLine(RPS.Heading());
+        Sleep(.25);
+
+    }
+
+    SD.Printf("\n\nHEADING AFTER: %f\n", RPS.Heading());
+    LCD.WriteLine(RPS.Heading());
+
+    return 0;
+
+}
+
+
+void check_Y(float y_position){
+    while(RPS.Y() < y_position){
+        move_forward(25, ONEINCH * 0.25);
+    }
+}
+
+// Function for moving to DDR
+void start_to_DDR()
+{
+    //1
+    while(Cds.Value() >= 1);
+    float a = Cds.Value();
+    Sleep(0.5);
+    SD.Printf("Start CdS Value: %f\n\n", a);
+
+    SD.Printf("\n\nEXITING START BLOCK:\n\n");
+    servo.SetDegree(80);
+    move_forward(35, 3.5*ONEINCH);
+    turn_right(35, TURN45 );
+
+    SD.Printf("\n\nGOING TO DDR LIGHT\n");
+    move_forward(35, 10.5*ONEINCH);
+}
+
+
+// This is the sweeping function , to detect DDR light color
+float rotate_DDR(int counts){
 
     float c = 1;
     int turn = 0;
@@ -350,21 +381,16 @@ float rotateDDR(int counts){
 //function to complete DDR task and stop before ramp
 void DDR_task(){
 
-    SD.Printf("\n\nEXITING START BLOCK:\n\n");
-    servo.SetDegree(80);
-    move_forward(35, 3.5*ONEINCH);
-    turn_right(35, TURN45 );
-
-    SD.Printf("\n\nGOING TO DDR LIGHT\n");
-    move_forward(35, 10.5*ONEINCH);
-
+    //1
     float c;
 
     SD.Printf("\n\nSWEEPING\n");
-    c = rotateDDR(30);
+    // This is the sweeping function , to detect DDR light color
+    c = rotate_DDR(30);
 
     if(c < 0.25) {
 
+        //still step 1
         SD.Printf("\n\nDDR Task: Red light\n\n");
         LCD.WriteLine("DDR TASK: RED LIGHT");
         LCD.SetBackgroundColor(RED);
@@ -379,20 +405,28 @@ void DDR_task(){
         SD.Printf("\nMoving Forwards\n\n");
         move_forward(35, ONEINCH * 6.0);
         turn_right(35, TURN90);
-
+        check_heading(270);
+        Sleep(0.25);
         SD.Printf("\nRuns into Button\n\n");
+        // Runs into the DDR button
         move_forward(25, ONEINCH * 1.5);
-        RunMotor(5.5, 25);
+        run_motor(5.5, 25);
 
+        //2
         move_backward(-35, ONEINCH * 2);
+        check_heading(270);
+        Sleep(0.25);
         turn_left(35, TURN90);
 
-
-        RunMotor(3, 35);
+        // Runs into the wall after the DDR task
+        run_motor(1.5, 35);
+        move_backward(-35 , ONEINCH * 1.25);
+        Sleep(0.25);
 
 
     } else {
 
+        //still step 1
         SD.Printf("\n\nDDR Task: Blue light\n\n");
         LCD.WriteLine("DDR TASK: BLUE LIGHT");
         LCD.SetBackgroundColor(BLUE);
@@ -402,28 +436,237 @@ void DDR_task(){
         turn_left(35 , TURN90);
         move_forward(35, ONEINCH * 3);
         turn_right(35, TURN90);
-        move_forward(35, ONEINCH * 13.5);
+        move_forward(35, ONEINCH * 13);
         turn_right(35, TURN90);
 
-        RunMotor(7, 35);
+        run_motor(7, 35);
 
+        //2
         move_backward(-35, ONEINCH * 2);
         turn_left(35, TURN90);
-
-        RunMotor(1, 35);
+    // Runs into the wall for first time
+        run_motor(1.5, 35);
+        move_backward(-35 , ONEINCH * 1.25);
+        Sleep(0.25);
 
     }
 
+    //still step 2
+   /* move_backward(-35 , ONEINCH * 1.5);
+    // Runs into the wall for the second time for 0.25 seconds to straighten chassis
+    run_motor(0.20, 35);
+    //3
     move_backward(-35 , ONEINCH * 1.5);
-    RunMotor(2, 35);
-    move_backward(-35 , ONEINCH * 1.5);
-    turn_left(35, TURN90);
+
+    Sleep(0.25);*/
+
+     turn_left(35, TURN90);
 }
 
-void servo_coin()
+// Moving from the DDR to the foosball
+void DDR_to_Foosball(){
+
+    int i = 0;
+    //1
+
+    SD.Printf("\nRAMP:\n\n");
+    // Moves backward before going up the ramp
+    move_backward(-35 , ONEINCH);
+    Sleep(0.5);
+    //call checkheading 90
+    check_heading(90);
+    Sleep(0.5);
+
+    //go to top of ramp
+    ramp(2.7 , 55);
+    //move_forward(55, 27.5 * ONEINCH);
+    LCD.SetBackgroundColor(YELLOW);
+    SD.Printf("\nTURNING YELLOW!\n");
+    LCD.Clear();
+
+    //right_motor.Stop();
+    //left_motor.Stop();
+    int a = RPS.Y();
+    Sleep(0.25);
+
+    if(a >= 0)
+    {
+        SD.Printf("\nCHECKING 90");
+        check_heading(90);
+        SD.Printf("\nFINISHED CHECKING HEADING!\n\n");
+    }
+
+    //straighten out on top of the ramp
+
+    /*
+
+    turn_left(25, TURN90);
+    check_heading(180);
+    move_forward(25, ONEINCH * 0.25);
+
+    turn_right(25, TURN90);
+    check_heading(90);
+    turn_right(25, TURN90 + TURN40);
+    run_motor(2, 25);
+
+    move_backward(-25, ONEINCH * 2);
+    turn_right(25, TURN90);
+
+    check_heading(270);
+
+    */
+
+    SD.Printf("\nTURNING 180!");
+    turn_right(25 , TURN90 * 2);
+    SD.Printf("\nTurned right, facing DDR");
+    Sleep(0.25);
+    a = RPS.Y();
+    if(a >= 0)
+    {
+        SD.Printf("\nCHECKING 270");
+        check_heading(270);
+        SD.Printf("\nFINISHED CHECKING HEADING!");
+    }
+
+    move_backward(-25 , ONEINCH * 11.5);
+    SD.Printf("AFTER RAMP MOVEMENT\n");
+    SD.Printf("\nGoing Down the stairs with adjusted motor\n\n");
+
+    // HITS THE BOTTOM OF THE STAIRS TO CORRECT ITSELF
+    //run_motor(1.0,10);
+    Sleep(0.25);
+   // move_backward(-25 , ONEINCH * 3);
+   // Sleep(0.25);
+    turn_right(25 , TURN90 * 2);
+    a = RPS.Y();
+    if(a >= 0)
+    {
+        SD.Printf("\nCHECKING 90");
+        check_heading(90);
+        SD.Printf("\nFINISHED CHECKING HEADING!");
+    }
+
+    Sleep(0.25);
+    run_motor(2.5, 35); //changed from 2.0 to 2.5
+    Sleep(0.25);
+
+    //3
+    SD.Printf("\nMoving Backwards\n\n");
+    move_backward(-35 , ONEINCH * 2);
+    Sleep(0.25);
+
+}
+
+// Moving the foosball counters
+void foosball(){
+
+    //1
+    //starts after robot has moved back from foosball wall
+    Sleep(0.25);
+
+    // Turns left after backing up from the wall
+    turn_left(25 , TURN45 - 15);
+    run_motor(0.8 , 35);
+    turn_left(25 , TURN45);
+
+    turn_right(25, TURN45);
+    move_backward(-25, ONEINCH * 2.75);
+    turn_left(25, TURN45);
+
+    move_forward(25, ONEINCH * 1.25);
+
+    Sleep(0.25);
+    move_forward(45 , ONEINCH * 1.8);
+    Sleep(0.25);
+    servo.SetDegree(1);
+    Sleep(0.5);
+
+    // Drags the foosball counters
+    move_forward(55, ONEINCH * 7);
+
+    //made a change here in distance from 4 to 6.5
+    //move_forward(45, 7.0 * ONEINCH);
+    Sleep(0.25);
+    servo.SetDegree(80);
+    Sleep(0.25);
+    move_backward(-25 , ONEINCH * 1.5);
+    Sleep(0.25);
+    servo.SetDegree(2);
+    Sleep(0.5);
+    move_forward(45 , ONEINCH * 3);
+    Sleep(0.25);
+    servo.SetDegree(80);
+    Sleep(0.5);
+
+
+
+    turn_left(25 , TURN45);
+    move_forward(25 , ONEINCH * 1.0);
+    turn_right(25 , TURN45);
+
+}
+
+// moving from foosball counters to the lever
+
+void foosball_to_lever()
 {
+    //1
+    move_forward(35 , 6.0 * ONEINCH);// changed from 6 to 6.5 inches
+    turn_left(35 , TURN45);
+    move_forward(35 , 3.0 * ONEINCH);
+    // servo arm hits lever
+
+}
+
+
+// Function to hit lever of claw machine with servo arm
+void lever()
+{
+    //1
+    servo.SetDegree(80);
+    Sleep(1.0);
+    servo.SetDegree(0);
+    Sleep(1000);
+    servo.SetDegree(80);
+
+}
+
+// Moving from the lever to the coin slot
+void lever_to_coin()
+{
+    //1
+    move_forward(35, ONEINCH*3.0);
+    turn_left(35, TURN45);
+    int i;
+    move_forward(35, ONEINCH * 11.0);
+
+    i = check_heading(270);
+
+    if(i != 0){
+        SD.Printf("RPS ERROR. SLEEPING");
+        LCD.WriteLine("RPS ERROR");
+        Sleep(2.0);
+    }
+
+    //2
+    turn_right(35 , TURN90);
+    // Runs into the wall
+    run_motor(0.75 , 35);
+
+    //3
+    move_backward(-35, ONEINCH * 13.75);
+    turn_left(35, TURN90);
+    run_motor(1.5,35);
+
+}
+
+// Servo arm is used to push coin into coin slot with dowel rod
+void coin()
+{
+    //1
     int initialDegree = 80;
     int count = 1;
+    // Servo arm rotates slowly to hit the dowel rod
     while(count < 10){
         Sleep(50);
         servo.SetDegree(initialDegree + count);
@@ -442,105 +685,10 @@ void servo_coin()
 
 }
 
-void lever_coin()
-{
-    int i;
+// Moving from coin slot to the final button
+void coin_to_final_button(){
 
-    move_forward(55 , 6 * ONEINCH);
-    turn_left(35 , TURN45);
-    move_forward(55 , 3.0 * ONEINCH);
-    // servo arm hits lever
-    move_servo();
-    move_forward(50, ONEINCH*3.0);
-    turn_left(35, TURN45);
-    move_forward(50, ONEINCH * 11.0);
-
-    i = check_heading(270);
-
-    if(i != 0){
-        LCD.WriteLine("RPS ERROR");
-        Sleep(2.0);\
-    }
-
-    turn_right(35 , TURN90);
-    // Runs into wall
-    RunMotor(0.75 , 35);
-    move_backward(-50, ONEINCH * 14);
-    turn_left(35, TURN90);
-
-    RunMotor(1.5,35);
-    servo_coin();
-}
-
-void RunMotorFoosball(float sleep1, int percent)
-{
-    left_motor.SetPercent(percent);
-    right_motor.SetPercent(percent);
-    Sleep(sleep1);
-
-    left_motor.Stop();
-    right_motor.Stop();
-    Sleep(1.0);
-
-}
-
-void foosball(){
-
-    //starts after robot has moved back from foosball wall
-
-    /*turn_left(25, TURN45);
-    Sleep(0.25);
-    move_forward(35 , ONEINCH * 1.75);
-    Sleep(0.25);
-    turn_left(25 , 130);*/
-
-    Sleep(0.25);
-    turn_left(25 , TURN90);
-
-    move_forward(25 , ONEINCH * 2.5);
-    Sleep(0.25);
-    servo.SetDegree(2);
-    Sleep(0.5);
-    //RunMotor(0.5 , 45);
-    move_forward(45, 4 * ONEINCH);
-    Sleep(0.25);
-    servo.SetDegree(70);
-
-}
-
-
-void ramp(){
-
-    int i;
-
-    SD.Printf("\nRAMP:\n\n");
-    //go to top of ramp
-    move_forward(55, 41 * ONEINCH);
-    Sleep(0.25);
-    i = check_heading(90);
-
-    if(i != 0){
-        LCD.WriteLine("RPS ERROR");
-        Sleep(2.0);\
-        turn_right(25, 25);
-    }
-
-    SD.Printf("\nGoing Down ramp with adjusted motor\n\n");
-    move_forward(35, 11 * ONEINCH);
-
-    Sleep(0.25);
-    RunMotor(2 , 35);
-    Sleep(0.25);
-
-
-    SD.Printf("\nMoving Backwards\n\n");
-    move_backward(-35 , ONEINCH * 1.5);
-    Sleep(0.25);
-
-}
-
-void final_button(){
-
+    //1
     move_backward(-35 , ONEINCH * 4);
     turn_right(35 , TURN90);
     move_forward(55 , ONEINCH * 10.5);
@@ -550,10 +698,8 @@ void final_button(){
     turn_left(25 , TURN45);
     move_forward(55 , ONEINCH * 2);
     turn_right(25 , TURN45);
-    RunMotor(1.0 , 25);
+    run_motor(1.0 , 25);
 }
-
-
 
 
 int main(void){
@@ -561,10 +707,7 @@ int main(void){
     RPS.InitializeTouchMenu();
 
     SD.OpenLog();
-
-    SD.Printf("VERSION: %s\nBATTERY VOLTAGE: %f\n\n\n","1.0.0", Battery.Voltage());
-
-    //move_backward(-25, ONEINCH * 4);
+    SD.Printf("VERSION: %s\nBATTERY VOLTAGE: %f\n\n\n","1.0.5", Battery.Voltage());
 
     //Servo motor max and min values
     servo.SetMin(514);
@@ -574,20 +717,17 @@ int main(void){
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
 
-    while(Cds.Value() >= 1);
-
-    float a = Cds.Value();
-    Sleep(0.5);
-
-    SD.Printf("Start CdS Value: %f\n\n", a);
-
+    // This function moves Cooper to the DDR
+    start_to_DDR();
     DDR_task();
-    ramp();
+    DDR_to_Foosball();
     foosball();
-
-    //after foosball task
-    lever_coin();
-    final_button();
-
+    foosball_to_lever();
+    // Function to hit lever of claw machine with servo arm
+    lever();
+    // Moving from
+    lever_to_coin();
+    // Servo arm is used to push coin into coin slot with dowel rod
+    coin();
+    coin_to_final_button();
 }
-
