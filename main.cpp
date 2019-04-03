@@ -25,6 +25,7 @@
 #define DEFAULTPOWER 35
 #define PCONST 0.5
 
+
 //Declarations for encoders & motors
 DigitalEncoder right_encoder(FEHIO::P0_0);
 DigitalEncoder left_encoder(FEHIO::P0_1);
@@ -64,7 +65,17 @@ void correct(void){
         right_motor.Stop();
     }
 
-    Sleep(1.0);
+    LCD.SetBackgroundColor(BLACK);
+    LCD.Clear();
+
+    Sleep(0.25);
+
+    LCD.SetBackgroundColor(WHITE);
+    LCD.Clear();
+
+    LCD.SetBackgroundColor(BLACK);
+    LCD.Clear();
+
 }
 
 // Function to move forward
@@ -259,6 +270,7 @@ void ramp(float sleep1, int percent)
     Sleep(1.0);
 }
 
+
 // Checking RPS Heading
 int check_heading(float heading) //using RPS
 {
@@ -276,15 +288,15 @@ int check_heading(float heading) //using RPS
 
 
     // NOTE: DO NOT PASS IN heading = 0
-    while(RPS.Heading() < heading - 3.5 || RPS.Heading() > heading + 3.5){
+    while(RPS.Heading() < heading - 2 || RPS.Heading() > heading + 2){
 
-        if(RPS.Heading() < heading - 3.5){
-            turn_left(30, 12);
+        if(RPS.Heading() < heading - 2){
+            turn_left(30, 5);
 
         }
 
-        else if(RPS.Heading() > heading + 3.5){
-            turn_right(30, 12);
+        else if(RPS.Heading() > heading + 2){
+            turn_right(30, 5);
 
         }
 
@@ -298,6 +310,13 @@ int check_heading(float heading) //using RPS
 
     return 0;
 
+}
+
+
+void check_Y(float y_position){
+    while(RPS.Y() < y_position){
+        move_forward(25, ONEINCH * 0.25);
+    }
 }
 
 // Function for moving to DDR
@@ -401,7 +420,7 @@ void DDR_task(){
 
         // Runs into the wall after the DDR task
         run_motor(1.5, 35);
-        move_backward(-35 , ONEINCH * 1.5);
+        move_backward(-35 , ONEINCH * 1.25);
         Sleep(0.25);
 
 
@@ -427,7 +446,7 @@ void DDR_task(){
         turn_left(35, TURN90);
     // Runs into the wall for first time
         run_motor(1.5, 35);
-        move_backward(-35 , ONEINCH * 1.5);
+        move_backward(-35 , ONEINCH * 1.25);
         Sleep(0.25);
 
     }
@@ -459,23 +478,44 @@ void DDR_to_Foosball(){
     Sleep(0.5);
 
     //go to top of ramp
-    ramp(2.5 , 55);
+    ramp(2.7 , 55);
     //move_forward(55, 27.5 * ONEINCH);
     LCD.SetBackgroundColor(YELLOW);
     SD.Printf("\nTURNING YELLOW!\n");
     LCD.Clear();
-    SD.Printf("\nTURNING OFF BOTH FUDGECAKING MOTORS.");
+
     //right_motor.Stop();
     //left_motor.Stop();
     int a = RPS.Y();
     Sleep(0.25);
-    // turns 180 degrees , facing DDR
+
     if(a >= 0)
     {
         SD.Printf("\nCHECKING 90");
         check_heading(90);
-        SD.Printf("\nFINISHED CHECKING HEADING!");
+        SD.Printf("\nFINISHED CHECKING HEADING!\n\n");
     }
+
+    //straighten out on top of the ramp
+
+    /*
+
+    turn_left(25, TURN90);
+    check_heading(180);
+    move_forward(25, ONEINCH * 0.25);
+
+    turn_right(25, TURN90);
+    check_heading(90);
+    turn_right(25, TURN90 + TURN40);
+    run_motor(2, 25);
+
+    move_backward(-25, ONEINCH * 2);
+    turn_right(25, TURN90);
+
+    check_heading(270);
+
+    */
+
     SD.Printf("\nTURNING 180!");
     turn_right(25 , TURN90 * 2);
     SD.Printf("\nTurned right, facing DDR");
@@ -491,6 +531,7 @@ void DDR_to_Foosball(){
     move_backward(-25 , ONEINCH * 12);
     SD.Printf("AFTER RAMP MOVEMENT\n");
     SD.Printf("\nGoing Down the stairs with adjusted motor\n\n");
+
     // HITS THE BOTTOM OF THE STAIRS TO CORRECT ITSELF
     //run_motor(1.0,10);
     Sleep(0.25);
@@ -522,22 +563,29 @@ void foosball(){
     //1
     //starts after robot has moved back from foosball wall
     Sleep(0.25);
-    // Turns left after backing up from the wall
-    turn_left(25 , TURN45);
-    run_motor(0.4 , 35); // changed from 0.25 to 0.35
-    turn_left(25 , TURN45);
-    Sleep(0.25);
 
-    move_forward(25 , ONEINCH * 1.75);
+    // Turns left after backing up from the wall
+    turn_left(25 , TURN45 - 25);
+    run_motor(0.8 , 35);
+    turn_left(25 , TURN45);
+
+    turn_right(25, TURN45);
+    move_backward(-25, ONEINCH * 2.5);
+    turn_left(25, TURN45);
+
+    move_forward(25, ONEINCH);
+
     Sleep(0.25);
-    servo.SetDegree(2);
+    move_forward(45 , ONEINCH * 1.8);
+    Sleep(0.25);
+    servo.SetDegree(1);
     Sleep(0.5);
 
     // Drags the foosball counters
-    //run_motor(0.5 , 45);
+    move_forward(55, ONEINCH * 7);
 
     //made a change here in distance from 4 to 6.5
-    move_forward(45, 7.0 * ONEINCH);
+    //move_forward(45, 7.0 * ONEINCH);
     Sleep(0.25);
     servo.SetDegree(80);
     Sleep(0.25);
@@ -597,7 +645,7 @@ void lever_to_coin()
     if(i != 0){
         SD.Printf("RPS ERROR. SLEEPING");
         LCD.WriteLine("RPS ERROR");
-        Sleep(2.0);\
+        Sleep(2.0);
     }
 
     //2
