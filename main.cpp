@@ -288,15 +288,15 @@ int check_heading(float heading) //using RPS
 
 
     // NOTE: DO NOT PASS IN heading = 0
-    while(RPS.Heading() < heading - 2 || RPS.Heading() > heading + 2){
+    while(RPS.Heading() < heading - 1 || RPS.Heading() > heading + 1){
 
-        if(RPS.Heading() < heading - 2){
-            turn_left(30, 5);
+        if(RPS.Heading() < heading - 1){
+            turn_left(30, 2);
 
         }
 
-        else if(RPS.Heading() > heading + 2){
-            turn_right(30, 5);
+        else if(RPS.Heading() > heading + 1){
+            turn_right(30, 2);
 
         }
 
@@ -478,7 +478,7 @@ void DDR_to_Foosball(){
     Sleep(0.5);
 
     //go to top of ramp
-    ramp(2.7 , 55);
+    ramp(2.65 , 55);
     //move_forward(55, 27.5 * ONEINCH);
     LCD.SetBackgroundColor(YELLOW);
     SD.Printf("\nTURNING YELLOW!\n");
@@ -498,24 +498,6 @@ void DDR_to_Foosball(){
 
     //straighten out on top of the ramp
 
-    /*
-
-    turn_left(25, TURN90);
-    check_heading(180);
-    move_forward(25, ONEINCH * 0.25);
-
-    turn_right(25, TURN90);
-    check_heading(90);
-    turn_right(25, TURN90 + TURN40);
-    run_motor(2, 25);
-
-    move_backward(-25, ONEINCH * 2);
-    turn_right(25, TURN90);
-
-    check_heading(270);
-
-    */
-
     SD.Printf("\nTURNING 180!");
     turn_right(25 , TURN90 * 2);
     SD.Printf("\nTurned right, facing DDR");
@@ -533,11 +515,20 @@ void DDR_to_Foosball(){
     SD.Printf("\nGoing Down the stairs with adjusted motor\n\n");
 
     // HITS THE BOTTOM OF THE STAIRS TO CORRECT ITSELF
-    //run_motor(1.0,10);
     Sleep(0.25);
-   // move_backward(-25 , ONEINCH * 3);
-   // Sleep(0.25);
-    turn_right(25 , TURN90 * 2);
+
+    turn_right(25 , TURN90);
+    a = RPS.Y();
+    if(a >= 0)
+    {
+        SD.Printf("\nCHECKING 90");
+        check_heading(180);
+        SD.Printf("\nFINISHED CHECKING HEADING!");
+    }
+
+    move_forward(25, ONEINCH);
+
+    turn_right(25 , TURN90);
     a = RPS.Y();
     if(a >= 0)
     {
@@ -550,10 +541,6 @@ void DDR_to_Foosball(){
     run_motor(2.5, 35); //changed from 2.0 to 2.5
     Sleep(0.25);
 
-    //3
-    SD.Printf("\nMoving Backwards\n\n");
-    move_backward(-35 , ONEINCH * 2);
-    Sleep(0.25);
 
 }
 
@@ -561,44 +548,38 @@ void DDR_to_Foosball(){
 void foosball(){
 
     //1
+    SD.Printf("\nMoving Backwards\n\n");
+    move_backward(-35 , ONEINCH * 2.5);
+
     //starts after robot has moved back from foosball wall
     Sleep(0.25);
 
     // Turns left after backing up from the wall
-    turn_left(25 , TURN45 - 15);
+    turn_left(25 , TURN45/2);
     run_motor(0.8 , 35);
-    turn_left(25 , TURN45);
+    Sleep(0.5);
+    turn_left(25 , TURN45 + TURN45/2);
 
     turn_right(25, TURN45);
     move_backward(-25, ONEINCH * 2.75);
-    turn_left(25, TURN45);
+    turn_left(25, TURN45 - 25);
 
-    move_forward(25, ONEINCH * 1.25);
+    move_backward(25, ONEINCH * .75);
+    move_forward(25, ONEINCH * 1.9);
 
-    Sleep(0.25);
-    move_forward(45 , ONEINCH * 1.8);
     Sleep(0.25);
     servo.SetDegree(1);
     Sleep(0.5);
 
     // Drags the foosball counters
-    move_forward(55, ONEINCH * 7);
+    move_forward(55, ONEINCH * 6.9);
 
     //made a change here in distance from 4 to 6.5
     //move_forward(45, 7.0 * ONEINCH);
     Sleep(0.25);
     servo.SetDegree(80);
     Sleep(0.25);
-    move_backward(-25 , ONEINCH * 1.5);
-    Sleep(0.25);
-    servo.SetDegree(2);
-    Sleep(0.5);
-    move_forward(45 , ONEINCH * 3);
-    Sleep(0.25);
-    servo.SetDegree(80);
-    Sleep(0.5);
-
-
+    move_forward(25 , ONEINCH);
 
     turn_left(25 , TURN45);
     move_forward(25 , ONEINCH * 1.0);
@@ -613,7 +594,7 @@ void foosball_to_lever()
     //1
     move_forward(35 , 6.0 * ONEINCH);// changed from 6 to 6.5 inches
     turn_left(35 , TURN45);
-    move_forward(35 , 3.0 * ONEINCH);
+    move_forward(35 , 5.0 * ONEINCH);
     // servo arm hits lever
 
 }
@@ -706,6 +687,8 @@ int main(void){
 
     RPS.InitializeTouchMenu();
 
+    LCD.WriteLine("Press");
+
     SD.OpenLog();
     SD.Printf("VERSION: %s\nBATTERY VOLTAGE: %f\n\n\n","1.0.5", Battery.Voltage());
 
@@ -717,12 +700,18 @@ int main(void){
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
 
-    // This function moves Cooper to the DDR
+    //float x, y;
+    //while(!LCD.Touch(&x, &y));
+    //Sleep(1.0);
+
+    //This function moves Cooper to the DDR
     start_to_DDR();
     DDR_task();
     DDR_to_Foosball();
+
     foosball();
     foosball_to_lever();
+
     // Function to hit lever of claw machine with servo arm
     lever();
     // Moving from
